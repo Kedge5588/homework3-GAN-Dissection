@@ -1,7 +1,9 @@
 # HW3 Report
 
 ## Generate images with GANPaint
+
 ![](https://i.imgur.com/6YaPzi8.gif)
+
 ### analysis
 GANPaint並不是隨意生成物件在圖片上的，而是會根據之前學習到的特徵來進行生成。像是它會學習到門都是貼在地上的，不會有浮在牆壁上的門，因此在生成門時它會讓門貼著地板。在上面的GIF圖，我們一開始想在空曠處畫上一棵樹，結果失敗了，接著我們卻成功的在圖片邊框附近畫上了樹，我們推測這是因為它的dataset裡有樹木的圖片裡面的樹都是在邊框附近的，所以直接在空曠的圖片中間畫上樹對它來說是不合理的。
 ## Dissect GAN model
