@@ -38,15 +38,19 @@ inference
 
 圖1：
 ![](https://i.imgur.com/BNiYfKW.png)
+
 mask:
 ![](https://i.imgur.com/Agl2Rho.png)
+
 result:
 ![](https://i.imgur.com/Dtuieih.png)
 
 圖2：
 ![](https://i.imgur.com/7Tk520X.png)
+
 mask:
 ![](https://i.imgur.com/pbQ48xS.png)
+
 result:
 ![](https://i.imgur.com/CDH3unH.png)
 
@@ -57,11 +61,13 @@ result:
 移除物件效果
 + GANDissection
 對像是雲或是草地這種大範圍紋理類的物件移除效果非常好。在移除物品類的物件有時會顯得不自然，例如樹木在移除時有可能會產生在空中有一小搓樹枝的不自然圖片。
+
 ![](https://i.imgur.com/7hngZDt.png) ![](https://i.imgur.com/KYE6otP.jpg)
 
 
 + Inpainting
 容易有移除不乾淨的狀況產生，處理過的圖片會留有殘影。
+
 ![](https://i.imgur.com/D7CsNtR.png) ![](https://i.imgur.com/oPEmZpJ.png)
 
 
