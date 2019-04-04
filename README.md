@@ -1,110 +1,73 @@
-# homework3-GAN-Dissection
+# HW3 Report
 
-## Assign
+## Generate images with GANPaint
+![](https://i.imgur.com/6YaPzi8.gif)
+### analysis
+GANPaint並不是隨意生成物件在圖片上的，而是會根據之前學習到的特徵來進行生成。像是它會學習到門都是貼在地上的，不會有浮在牆壁上的門，因此在生成門時它會讓門貼著地板。在上面的GIF圖，我們一開始想在空曠處畫上一棵樹，結果失敗了，接著我們卻成功的在圖片邊框附近畫上了樹，我們推測這是因為它的dataset裡有樹木的圖片裡面的樹都是在邊框附近的，所以直接在空曠的圖片中間畫上樹對它來說是不合理的。
+## Dissect GAN model
+### GAN Dissection
+ Introduction
 
-1.  10% (Generate images with GANPaint)
-2.  20% (Dissect any GAN model and analyze what you find)
-3.  20% (Compare with other method)
-4.  30% (Assistant) 
-5.  20% (Mutual evaluation)
+自從GAN出現以後，越來越多人開始研究GAN，也出現了各種應用。我們明白GAN的原理也會使用GAN，但是，我們對它內部的運作還有實際上影響它生成圖片的機制其實並不了解，而這篇paper的作者察覺到了這些事，所以他們設計了這個方法來研究GAN裡面的每個unit分別都影響著圖片生成的哪些部分。這個方法不只使我們更了解GAN的運作與組成，也對改善與設計GAN有了更好的方式。
 
-reference:
+我們dissect了github上的範例model (three layers of the LSUN living room progressive GAN trained by Karras)。雖然他的GAN editing server我們無法順利啟動，但是可以從生成的.json檔可以看到，每個unit代表著甚麼，哪個物件又代表著那些unit。
 
-[Inpainting](https://github.com/akmtn/pytorch-siggraph2017-inpainting)
+#### Example
+![](https://i.imgur.com/AV8QW2n.jpg)
+layer7的unit61裡面的資訊，可以看到它是屬於sofa這個label的
 
-## Introduction - GANDissect <a href="http://gandissect.res.ibm.com/ganpaint.html?project=churchoutdoor&layer=layer4"><img src='doc/ganpaint.gif' align="right" height="259"></a>
+![](https://i.imgur.com/FlSy559.jpg)
+在layer7中sofa這個物件對應到的units
 
-[**Project**](https://gandissect.csail.mit.edu/) | [**Demo**](http://gandissect.res.ibm.com/ganpaint.html?project=churchoutdoor&layer=layer4) | [**Paper**](https://arxiv.org/pdf/1811.10597.pdf) | [**Video**](http://tiny.cc/gandissect) <br>
-[GAN Dissection](https://gandissect.csail.mit.edu/) is a way to inspect the internal representations of a generative adversarial network (GAN) to understand how internal units align with human-interpretable concepts. It is part of [NetDissect](https://netdissect.csail.mit.edu/).
+## Compare with other methods
+### Inpainting
+Introduction
 
-This repo allows you to dissect a GAN model. It provides the dissection results as a static summary or as an interactive visualization. Try our interactive [GANPaint demo](http://gandissect.res.ibm.com/ganpaint.html?project=churchoutdoor&layer=layer4) to interact with GANs and draw images. 
+Globally and Locally Consistent Image Completion
 
-## Overview
+這篇paper用了gan的概念來達到image completion,其中比較特別的部分是他用了global和local的generator來負責不同的部分，global負責檢查這塊區域與在整張的一致性，而local負責檢查他與鄰居是否夠一致，而global generator與local generator所產生出來的會被discriminator檢驗。這樣的用生成的方法與傳統用patch-base的方法比起來，會更加的自然，因為它可以自己生產出合理的區塊
 
-<img src="doc/teaser.jpg" width="800px" clear="both" />
+以下為其架構圖：
+![](https://i.imgur.com/RskBbXY.png)
 
-[Visualizing and Understanding Generative Adversarial Networks](http://gandissect.csail.mit.edu) <br>
-[David Bau](http://people.csail.mit.eduÂ/davidbau/home/), [Jun-Yan Zhu](http://people.csail.mit.edu/junyanz/), [Hendrik Strobelt](http://hendrik.strobelt.com/), [Bolei Zhou](http://people.csail.mit.edu/bzhou/), [Joshua B. Tenenbaum](http://web.mit.edu/cocosci/josh.html), [William T. Freeman](https://billf.mit.edu/), [Antonio Torralba](http://web.mit.edu/torralba/www/) <br>
-MIT CSAIL, MIT-IBM Watson AI Lab, CUHK, IBM Research <br>
-In arXiv, 2018.
+ inference
 
-## Getting Started
-Let's set up the environment and dissect a `churchoutdoor` GAN. This requires some CUDA-enabled GPU and some disk space.
+在inference之前，必須先將要移除的object先mask起來。
+並且提供原圖以及mask圖。
+以下mask圖為我們跑R-CNN所得到的。
 
-### Setup
+圖1：
+![](https://i.imgur.com/BNiYfKW.png)
+mask:
+![](https://i.imgur.com/Agl2Rho.png)
+result:
+![](https://i.imgur.com/Dtuieih.png)
 
-To install everything needed from this repo, have `conda` available,
-and run:
+圖2：
+![](https://i.imgur.com/7Tk520X.png)
+mask:
+![](https://i.imgur.com/pbQ48xS.png)
+result:
+![](https://i.imgur.com/CDH3unH.png)
 
-```
-script/setup_env.sh      # Create a conda environment with dependencies
-script/make_dirs.sh      # Create the dataset and dissect directories
-script/download_data.sh  # Download support data and demo GANs
-source activate netd     # Enter the conda environment
-pip install -v -e .      # Link the local netdissect package into the env
-```
+可以看得出來圖一右邊的長頸鹿幾乎快消失了，但是左邊的兩隻馬就有點明顯。推測很有可能是被global的generator影響，所以沒辦法整張都是綠色的草原，一定會有點馬的顏色在裡面，所以才產生這樣的結果。
+而圖二的結果則是相當差勁，合理推測是因為原圖的背景以及顏色均較複雜且多元，所以整個network在生成時，被附近複雜的背景所影響，而導致整體結果變差。
 
-Details.  The code depends on python 3, Pytorch 4.1, and several other
-packages.  For conda users, `script/environment.yml` provides the details
-of the dependencies.  For pip users, `setup.py` lists everything needed.
-
-Data.  The `download_data.sh` script downloads the segmentation dataset
-used to dissect classifiers, the segmentation network used to dissect GANs,
-and several example GAN models to dissect.  The downloads will go into
-the directories `dataset/` and `models/`.  If you do not wish to download
-the example networks, `python -m netdissect --download` will download
-just the data and models needed for netdissect itself.
-
-
-### Dissecting a GAN
-
-GAN example: to dissect three layers of the LSUN living room progressive
-GAN trained by Karras:
-
-```
-python -m netdissect \
-   --gan \
-   --model "netdissect.proggan.from_pth_file('models/karras/livingroom_lsun.pth')" \
-   --outdir "dissect/livingroom" \
-   --layer layer1 layer4 layer7 \
-   --size 1000
-```
-
-The result is a static HTML page at `dissect/livingroom/dissect.html`, and
-a JSON file of metrics at `dissect/livingroom/dissect.json`.
-
-You can test your own model: the `--model` argument is a fully-qualified
-python function or constructor for loading the GAN to test.  The
-`--layer` names are fully-qualified (`state_dict`-style) names for layers.
-
-By default, a scene-based segmentation is used but a different segmenter class
-can be substituted by supplying an alternate class constructor to
-`--segmenter`.  See `netdissect/segmenter.py` for the segmenter base class.
-
-## Running a GAN editing server (alpha)
+#### comparison
+移除物件效果
++ GANDissection
+對像是雲或是草地這種大範圍紋理類的物件移除效果非常好。在移除物品類的物件有時會顯得不自然，例如樹木在移除時有可能會產生在空中有一小搓樹枝的不自然圖片。
+![](https://i.imgur.com/7hngZDt.png)![](https://i.imgur.com/KYE6otP.jpg)
 
 
-Once a GAN is dissected, you can run a web server that provides an API
-that generates images with (optional) interventions.
-
-```
-python -m netdissect.server --address 0.0.0.0
-```
-<img src='doc/ganter_screenshot.png' width='40%' align='right' style="padding:3px;">
++ Inpainting
+容易有移除不乾淨的狀況產生，處理過的圖片會留有殘影。
+![](https://i.imgur.com/D7CsNtR.png) ![](https://i.imgur.com/oPEmZpJ.png)
 
 
 
-The editing UI (right) is served at [http://localhost:5001/](http://localhost:5001/) .
 
-Other URLs:
 
-- [http://localhost:5001/api/ui](http://localhost:5001/api/ui) is the OpenAPI/swagger UI for directly
-    testing GAN interventions.
-- [http://localhost:5001/data/livingroom/dissect.html](http://localhost:5001/data/livingroom/dissect.html) static net
-    dissection reports.
-- [http://localhost:5001/data/livingroom/edit.html](http://localhost:5001/data/livingroom/edit.html) a dissection-based
-    interface for testing interventions.
-- TODO: [http://localhost:5001/ganpaint.html](http://localhost:5001/ganpaint.html) will serve GANpaint
 
-## Acknowledgments
-Code is from [gandissect](https://github.com/CSAILVision/GANDissect). All credit goes to the authors of [gandissect](https://gandissect.csail.mit.edu/), David Bau, Jun-Yan Zhu, Hendrik Strobelt, Bolei Zhou, Joshua B. Tenenbaum, William T. Freeman and Antonio Torralba.
+
+
