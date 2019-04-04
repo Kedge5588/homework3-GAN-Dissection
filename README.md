@@ -6,7 +6,7 @@
 GANPaint並不是隨意生成物件在圖片上的，而是會根據之前學習到的特徵來進行生成。像是它會學習到門都是貼在地上的，不會有浮在牆壁上的門，因此在生成門時它會讓門貼著地板。在上面的GIF圖，我們一開始想在空曠處畫上一棵樹，結果失敗了，接著我們卻成功的在圖片邊框附近畫上了樹，我們推測這是因為它的dataset裡有樹木的圖片裡面的樹都是在邊框附近的，所以直接在空曠的圖片中間畫上樹對它來說是不合理的。
 ## Dissect GAN model
 ### GAN Dissection
- Introduction
+Introduction
 
 自從GAN出現以後，越來越多人開始研究GAN，也出現了各種應用。我們明白GAN的原理也會使用GAN，但是，我們對它內部的運作還有實際上影響它生成圖片的機制其實並不了解，而這篇paper的作者察覺到了這些事，所以他們設計了這個方法來研究GAN裡面的每個unit分別都影響著圖片生成的哪些部分。這個方法不只使我們更了解GAN的運作與組成，也對改善與設計GAN有了更好的方式。
 
@@ -30,7 +30,7 @@ Globally and Locally Consistent Image Completion
 以下為其架構圖：
 ![](https://i.imgur.com/RskBbXY.png)
 
- inference
+inference
 
 在inference之前，必須先將要移除的object先mask起來。
 並且提供原圖以及mask圖。
@@ -57,7 +57,7 @@ result:
 移除物件效果
 + GANDissection
 對像是雲或是草地這種大範圍紋理類的物件移除效果非常好。在移除物品類的物件有時會顯得不自然，例如樹木在移除時有可能會產生在空中有一小搓樹枝的不自然圖片。
-![](https://i.imgur.com/7hngZDt.png)![](https://i.imgur.com/KYE6otP.jpg)
+![](https://i.imgur.com/7hngZDt.png) ![](https://i.imgur.com/KYE6otP.jpg)
 
 
 + Inpainting
