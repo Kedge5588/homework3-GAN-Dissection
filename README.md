@@ -37,21 +37,27 @@ inference
 以下mask圖為我們跑R-CNN所得到的。
 
 圖1：
+
 ![](https://i.imgur.com/BNiYfKW.png)
 
 mask:
+
 ![](https://i.imgur.com/Agl2Rho.png)
 
 result:
+
 ![](https://i.imgur.com/Dtuieih.png)
 
 圖2：
+
 ![](https://i.imgur.com/7Tk520X.png)
 
 mask:
+
 ![](https://i.imgur.com/pbQ48xS.png)
 
 result:
+
 ![](https://i.imgur.com/CDH3unH.png)
 
 可以看得出來圖一右邊的長頸鹿幾乎快消失了，但是左邊的兩隻馬就有點明顯。推測很有可能是被global的generator影響，所以沒辦法整張都是綠色的草原，一定會有點馬的顏色在裡面，所以才產生這樣的結果。
